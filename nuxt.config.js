@@ -3,7 +3,7 @@ module.exports = {
   ** Headers of the page
   */
   head: {
-    title: 'yedarm의 닌텐도 정리 사이트',
+    title: 'yedarm의 닌텐도 정리 사이트, 닌텐도 스위치 정발 12/1',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
