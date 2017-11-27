@@ -7,7 +7,7 @@ module.exports = {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { name: 'description', content: '닌텐도 스위치 출시를 기념하여 만들어 놓은 그리고 발표 준비를 위해서 시도해본 마리오나 젤다 같은 게임 등과 같은 닌텐도의 정보들을 정리해본 사이트입니다.' }
+      { name: 'description', content: '마리오, 젤다, 닌텐도 정보 정리 사이트.' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
