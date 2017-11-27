@@ -3,8 +3,11 @@
     <div>
       <logo/>
       <h1 class="title">
-        seo-study
+        yedarm의 닌텐도 정리 사이트
       </h1>
+			<h2>
+				젤다, 마리오
+			</h2>
       <h2 class="subtitle">
         Nuxt.js project
       </h2>
