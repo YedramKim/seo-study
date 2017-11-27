@@ -7,7 +7,7 @@ module.exports = {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { name: 'description', content: '마리오, 젤다, 닌텐도 정보 정리 사이트.' }
+      { name: 'description', content: 'yedarm 마리오, 젤다, 닌텐도 정보 정리 사이트.' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
