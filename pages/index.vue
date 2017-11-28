@@ -3,18 +3,18 @@
     <div>
       <logo/>
       <h1 class="title">
-        yedarm의 닌텐도 정리 사이트
+        닌텐도 스위치 정발
       </h1>
 			<h2>
-				젤다, 마리오
+				<a href="http://www.nintendo.co.kr/main.php">한국 닌텐도</a>
 			</h2>
       <h2 class="subtitle">
-        Nuxt.js project
+        12/1
       </h2>
-      <div class="links">
+      <!-- <div class="links">
         <a href="https://nuxtjs.org/" target="_blank" class="button--green">Documentation</a>
         <a href="https://github.com/nuxt/nuxt.js" target="_blank" class="button--grey">GitHub</a>
-      </div>
+      </div> -->
     </div>
   </section>
 </template>
