@@ -21,6 +21,11 @@ module.exports = {
 				content: '/swtich.png'
 			},
 			{
+				property: 'og:image',
+				// content: 'http://www.seo-study.ga/63c1b5a5a3283393d8c950002ec6d826.png'
+				content: '/mariodot.png'
+			},
+			{
 				property: 'og:url',
 				content: 'http://www.nintendo.co.kr/main.php'
 			},
