@@ -8,7 +8,7 @@
 					:avatar="theme"
 					:key="theme"></vue-mario>
 			</div>
-			<img class="w" src="~assets/swtich.png" alt="">
+			<img class="w" src="~assets/switch.png" alt="">
       <h1 class="title">
         닌텐도 스위치 정발
       </h1>
