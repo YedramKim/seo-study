@@ -5,7 +5,6 @@
       <h1 class="title">
         닌텐도 스위치 정발
       </h1>
-			<img src="~/assets/63c1b5a5a3283393d8c950002ec6d826.png" alt="">
       <h2 class="subtitle">
         12/1
       </h2>
