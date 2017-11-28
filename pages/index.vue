@@ -1,7 +1,10 @@
 <template>
   <section class="container">
     <div>
-			<vue-mario></vue-mario>
+			<vue-mario
+				class="mario"
+				v-for="num of 5"
+				:key="num"></vue-mario>
       <h1 class="title">
         닌텐도 스위치 정발
       </h1>
