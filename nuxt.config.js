@@ -19,6 +19,10 @@ module.exports = {
 				property: 'og:image',
 				// content: 'http://www.seo-study.ga/63c1b5a5a3283393d8c950002ec6d826.png'
 				content: 'http://image.fmkorea.com/files/attach/new/20161229/486616/177782625/547240921/63c1b5a5a3283393d8c950002ec6d826.png'
+			},
+			{
+				property: 'og:url',
+				content: 'http://www.nintendo.co.kr/main.php'
 			}
     ],
     link: [
