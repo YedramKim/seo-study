@@ -21,11 +21,11 @@ module.exports = {
 			},
 			{
 				property: 'og:image',
-				content: 'http://www.seo-study.ga//switch.png'
+				content: 'http://www.seo-study.ga/switch.png'
 			},
 			{
 				property: 'og:image:width',
-				content: '600'
+				content: '600px'
 			},
 			{
 				property: 'og:image',
@@ -33,11 +33,11 @@ module.exports = {
 			},
 			{
 				property: 'og:image:width',
-				content: '500'
+				content: '500px'
 			},
 			{
 				property: 'og:url',
-				content: 'http://www.nintendo.co.kr/main.php'
+				content: 'http://www.seo-study.ga'
 			}
     ],
     link: [
