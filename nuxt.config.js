@@ -8,6 +8,10 @@ module.exports = {
       { charset: 'utf-8' },
 			{ name: 'viewport', content: 'width=device-width, initial-scale=1' },
 			{
+				property: 'og:type',
+				content: 'website'
+			},
+			{
 				property: 'og:title',
 				content: '닌텐도 스위치 12/1 정발 예정'
 			},
@@ -34,14 +38,6 @@ module.exports = {
 			{
 				property: 'og:url',
 				content: 'http://www.nintendo.co.kr/main.php'
-			},
-			{
-				property: 'og:type',
-				content: 'website'
-			},
-			{
-				property: 'og:video',
-				content: 'https://www.youtube.com/watch?v=ozy47ynfl9o'
 			}
     ],
     link: [
