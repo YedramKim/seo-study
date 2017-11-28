@@ -16,6 +16,10 @@ module.exports = {
 				content: '닌텐도 스위치 12/1 정발 예정'
 			},
 			{
+				property: 'og:title',
+				content: '닌텐도 스위치 12/1 정발 축하'
+			},
+			{
 				property: 'og:description',
 				content: '다음날 12/1 닌텐도 스위치가 정발이 됩니다. 행복합니다.'
 			},
