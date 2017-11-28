@@ -1,16 +1,16 @@
 <template>
   <section class="container">
     <div>
-      <logo/>
+			<vue-mario></vue-mario>
       <h1 class="title">
         닌텐도 스위치 정발
       </h1>
-			<h2>
-				<a href="http://www.nintendo.co.kr/main.php">한국 닌텐도</a>
-			</h2>
       <h2 class="subtitle">
         12/1
       </h2>
+			<h2 class="links">
+				<a href="http://www.nintendo.co.kr/main.php" class="button--green">한국 닌텐도</a>
+			</h2>
       <!-- <div class="links">
         <a href="https://nuxtjs.org/" target="_blank" class="button--green">Documentation</a>
         <a href="https://github.com/nuxt/nuxt.js" target="_blank" class="button--grey">GitHub</a>
@@ -20,13 +20,17 @@
 </template>
 
 <script>
+/* eslint-disable */
 import Logo from '~/components/Logo.vue'
+import VueMario from '~/components/Vue-mario.vue'
 
 export default {
   components: {
-    Logo
+		Logo,
+		VueMario
   }
 }
+/* eslint-disable */
 </script>
 
 <style>
