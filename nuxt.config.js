@@ -1,3 +1,5 @@
+const META = (property, content) => ({property, content});
+
 module.exports = {
   /*
   ** Headers of the page
@@ -42,7 +44,8 @@ module.exports = {
 			{
 				property: 'og:url',
 				content: 'http://www.seo-study.ga'
-			}
+			},
+			META('twitter:card', 'summary')
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
