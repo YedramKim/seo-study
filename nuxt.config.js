@@ -47,7 +47,8 @@ module.exports = {
 			},
 			META('twitter:url', 'http://www.seo-study.ga'),
 			// META('twitter:card', 'photo'),
-			META('twitter:card', 'summary_large_image'),
+			// META('twitter:card', 'summary_large_image'),
+			META('twitter:card', 'app'),
 			META('twitter:title', '닌텐도 스위치 12/1 정발 예정 (트위터 카드)'),
 			META('twitter:description', '다음날 12/1 닌텐도 스위치가 정발 소식을 트위터에 올려보왔습니다.'),
 			META('twitter:image', 'http://www.seo-study.ga/switch.png')
