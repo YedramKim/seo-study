@@ -35,7 +35,7 @@ module.exports = {
 			},
 			{
 				property: 'og:image',
-				content: 'http://www.seo-study.ga//mariodot.png'
+				content: 'http://www.seo-study.ga/mariodot.png'
 			},
 			{
 				property: 'og:image:width',
@@ -45,7 +45,11 @@ module.exports = {
 				property: 'og:url',
 				content: 'http://www.seo-study.ga'
 			},
-			META('twitter:card', 'summary')
+			META('twitter:url', 'http://www.seo-study.ga'),
+			META('twitter:card', 'summary'),
+			META('twitter:title', '닌텐도 스위치 12/1 정발 예정'),
+			META('twitter:description', '다음날 12/1 닌텐도 스위치가 정발 소식을 트위터에 올려보왔습니다.'),
+			META('twitter:image', 'http://www.seo-study.ga/switch.png')
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
