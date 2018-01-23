@@ -33,11 +33,12 @@
 			</button>
 		</div>
 		<div class="generate-wrapper">
-			<h2>{{type}}</h2>
 			<select v-model="type">
 				<option value="prim">Prim's Algorithm</option>
+				<option value="hunt">Hunt-and-Kill Algorithm</option>
+				<option value="wilson">Wilson's Algorithm</option>
 			</select>
-			<button @click="generateMaze">
+			<button @click="generateMaze(type)">
 				Generate
 			</button>
 		</div>
@@ -51,10 +52,26 @@ export default {
 	name: 'vue-maze',
 	computed: {
 		...mapState({
-			width: 'width',
-			height: 'height',
 			maze: 'maze'
-		})
+		}),
+		...{
+			width: {
+				get() {
+					return this.$store.state.width;
+				},
+				set(val) {
+					this.$store.commit('setWidth', val);
+				}
+			},
+			height: {
+				get() {
+					return this.$store.state.height;
+				},
+				set(val) {
+					this.$store.commit('setHeight', val);
+				}
+			}
+		}
 	},
 	methods: {
 		...mapMutations({
@@ -73,11 +90,7 @@ export default {
 		const {width, height} = this;
 		this.initMaze({
 			width: 5,
-			height: 5,
-			startPos: {
-				x: 4,
-				y: 2
-			}
+			height: 5
 		});
 	}
 };
