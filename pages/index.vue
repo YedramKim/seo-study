@@ -1,7 +1,8 @@
 <template>
   <section class="container">
     <div>
-			<div class="mario-wrapper">
+			<vue-maze></vue-maze>
+			<!-- <div class="mario-wrapper">
 				<vue-mario
 					class="ms"
 					v-for="theme of ['', 'mexico', 'amiibo', 'winter']"
@@ -17,7 +18,7 @@
       </h2>
 			<h2 class="links">
 				<a href="http://www.nintendo.co.kr/main.php" class="button--green">한국 닌텐도</a>
-			</h2>
+			</h2> -->
       <!-- <div class="links">
         <a href="https://nuxtjs.org/" target="_blank" class="button--green">Documentation</a>
         <a href="https://github.com/nuxt/nuxt.js" target="_blank" class="button--grey">GitHub</a>
@@ -30,11 +31,13 @@
 /* eslint-disable */
 import Logo from '~/components/Logo.vue'
 import VueMario from '~/components/Vue-mario.vue'
+import VueMaze from '~/components/Vue-maze.vue';
 
 export default {
   components: {
 		Logo,
-		VueMario
+		VueMario,
+		VueMaze
   }
 }
 /* eslint-disable */
@@ -45,7 +48,6 @@ export default {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
   text-align: center;
 }
 
