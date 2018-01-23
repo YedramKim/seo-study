@@ -22,13 +22,14 @@
 			</table>
 		</div>
 		<div class="set-wrapper">
+			<h2 v-if="timer !== 0">{{timer}}s</h2>
 			<div>
 				width: <input type="text" v-model.number="width">
 			</div>
 			<div>
 				heigth: <input type="text" v-model.number="height">
 			</div>
-			<button @click="initMaze({width, height})">
+			<button @click="resetMaze({width, height})">
 				apply
 			</button>
 		</div>
@@ -52,7 +53,8 @@ export default {
 	name: 'vue-maze',
 	computed: {
 		...mapState({
-			maze: 'maze'
+			maze: 'maze',
+			timer: 'timer'
 		}),
 		...{
 			width: {
@@ -75,7 +77,7 @@ export default {
 	},
 	methods: {
 		...mapMutations({
-			initMaze: 'initMaze'
+			resetMaze: 'resetMaze'
 		}),
 		...mapActions({
 			generateMaze: 'generateMaze'
@@ -88,7 +90,7 @@ export default {
 	},
 	mounted() {
 		const {width, height} = this;
-		this.initMaze({
+		this.resetMaze({
 			width: 5,
 			height: 5
 		});

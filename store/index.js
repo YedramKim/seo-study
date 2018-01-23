@@ -3,13 +3,35 @@ import _ from 'lodash';
 
 const Cell = ({x, y, top, right, bottom, left}) => ({x, y, top, right, bottom, left});
 const checkActive = ({top, right, bottom, left}) => top || right || bottom || left;
-const isNominee = (targetMaze, maze) => {
+const isNeighbor = (targetMaze, maze) => {
 	let xDiff = Math.abs(targetMaze.x - maze.x);
 	let yDiff = Math.abs(targetMaze.y - maze.y);
 	if (xDiff === 0) {
 		return yDiff === 1;
 	} else if (yDiff === 0) {
 		return xDiff === 1;
+	}
+};
+const connectMaze = (target, nominee) => {
+	let xDiff = (target.x - nominee.x);
+	let yDiff = (target.y - nominee.y);
+
+	if (Math.abs(xDiff) === 0) {
+		if (yDiff === -1) {
+			target.bottom = true;
+			nominee.top = true;
+		} else if (yDiff === 1) {
+			target.top = true;
+			nominee.bottom = true;
+		}
+	} else if (Math.abs(yDiff) === 0) {
+		if (xDiff === -1) {
+			target.right = true;
+			nominee.left = true;
+		} else if (xDiff === 1) {
+			target.left = true;
+			nominee.right = true;
+		}
 	}
 };
 const random = (min = 0, max = 0) => {
@@ -19,50 +41,17 @@ const random = (min = 0, max = 0) => {
 	const range = max - min;
 	return Math.round(Math.random() * range) + min;
 };
-const top = true;
-const right = true;
-const bottom = true;
-const left = true;
-const mazeExample = [
-	[
-		Cell({top, right}),
-		Cell({left, right}),
-		Cell({left, right}),
-		Cell({left, right}),
-		Cell({left, bottom})
-	],
-	[
-		Cell({right, bottom}),
-		Cell({left, right}),
-		Cell({left, right}),
-		Cell({left, right}),
-		Cell({top, left})
-	],
-	[
-		Cell({right, top}),
-		Cell({right, left}),
-		Cell({right, left}),
-		Cell({right, left}),
-		Cell({left, bottom})
-	],
-	[
-		Cell({bottom, right}),
-		Cell({left, right}),
-		Cell({left, right}),
-		Cell({left, right}),
-		Cell({top, left})
-	]
-];
 const store = () => new Vuex.Store({
 	state: {
 		width: 10,
 		height: 10,
 		maze: [],
-		lastPosition: {}
+		startPosition: {},
+		startTime: 0,
+		timer: 0
 	},
 	mutations: {
-		initMaze(state) {
-
+		resetMaze(state) {
 			let maze = [];
 			for(let y = 0; y < state.height; ++y) {
 				let row = [];
@@ -72,18 +61,23 @@ const store = () => new Vuex.Store({
 				maze.push(row);
 			}
 			state.maze = maze;
+			state.timer;
 		},
-		resetMaze(state) {
-			state.maze = JSON.parse(JSON.stringify(state.maze));
-		},
-		setLastPosition(state, pos) {
-			state.lastPosition = pos;
+		setStartPosition(state, pos) {
+			state.startPosition = pos;
 		},
 		setWidth (state, width) {
 			state.width = width;
 		},
 		setHeight (state, height) {
 			state.height = height;
+		},
+		startTimer: function(state) {
+			state.startTime = Date.now();
+			state.timer = 0;
+		},
+		endTimer(state) {
+			state.timer = (Date.now() - state.startTime) / 1000;
 		}
 	},
 	getters: {
@@ -100,8 +94,9 @@ const store = () => new Vuex.Store({
 	actions: {
 		generateMaze({ dispatch, state, commit, getters }, type) {
 			const {width, height} = state;
-			let lastPosition = state.maze[random(state.height)][random(state.width)];
-			commit('setLastPosition', lastPosition);
+			let startPosition = state.maze[random(state.height)][random(state.width)];
+			commit('setStartPosition', startPosition);
+			commit('startTimer');
 			dispatch(`generate-${type}`);
 		},
 		'generate-prim': function({ dispatch, state, commit, getters }) {
@@ -110,48 +105,52 @@ const store = () => new Vuex.Store({
 			let target;
 			let nominee;
 			if (activeMaze.length === 0) {
-				target = state.lastPosition;
-				nominee = unActiveMaze.filter(maze => isNominee(target, maze))[0];
+				target = state.startPosition;
+				nominee = unActiveMaze.filter(maze => isNeighbor(target, maze))[0];
 			} else if (getters.unActiveMaze.length !== 0) {
 				let nominees = [];
 				do {
 					target = activeMaze[random(0, activeMaze.length - 1)];
-					nominees = unActiveMaze.filter(maze => isNominee(target, maze));
+					nominees = unActiveMaze.filter(maze => isNeighbor(target, maze));
 				} while (nominees.length === 0);
 
 				nominee = nominees[random(0, nominees.length - 1)];
 			} else {
+				commit('endTimer');
 				return;
 			}
 
-			console.log(target, nominee);
-			let xDiff = (target.x - nominee.x);
-			let yDiff = (target.y - nominee.y);
-
-			if (Math.abs(xDiff) === 0) {
-				if (yDiff === -1) {
-					target.bottom = true;
-					nominee.top = true;
-				} else if (yDiff === 1) {
-					target.top = true;
-					nominee.bottom = true;
-				}
-			} else if (Math.abs(yDiff) === 0) {
-				if (xDiff === -1) {
-					target.right = true;
-					nominee.left = true;
-				} else if (xDiff === 1) {
-					target.left = true;
-					nominee.right = true;
-				}
-			}
+			connectMaze(target, nominee);
 
 			requestAnimationFrame(() => {
 				dispatch('generate-prim');
 			});
 		},
 		'generate-hunt': function({ dispatch, state, commit, getters }) {
-			console.log('generate-hunt');
+			let target = state.startPosition;
+			let { activeMaze, unActiveMaze } = getters;
+			let nominees = unActiveMaze.filter(maze => isNeighbor(startPosition, maze));
+			if (unActiveMaze.length === 0) {
+				return;
+			} else if (nominees.length === 0) {
+				let nominee = unActiveMaze.find(maze => {
+					let result = activeMaze.some(maze2 => {
+						let result2 = isNeighbor(maze, maze2);
+						if (result2) {
+							target = maze2;
+							return true;
+						}
+					});
+					if (result) {
+						return maze;
+					}
+				});
+			} else {
+				let nominee = nominees[random(0, nominees.length - 1)];
+			}
+			connectMaze(target, nominee);
+			commit('setStartPosition', nominee);
+			commit('generate-hunt');
 		},
 		'generate-wilson': function({ dispatch, state, commit, getters }) {
 			console.log('generate-wilson');
