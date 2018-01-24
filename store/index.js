@@ -2,20 +2,24 @@ import Vuex from 'vuex';
 import _ from 'lodash';
 
 const Cell = ({x, y, ready, top, right, bottom, left}) => ({x, y,ready,  top, right, bottom, left});
-const checkActive = ({top, right, bottom, left}) => top || right || bottom || left;
-const isNeighbor = (targetMaze, maze) => {
-	let xDiff = Math.abs(targetMaze.x - maze.x);
-	let yDiff = Math.abs(targetMaze.y - maze.y);
-	if (xDiff === 0) {
-		return yDiff === 1;
-	} else if (yDiff === 0) {
-		return xDiff === 1;
-	}
-};
+const checkActive = ({top, right, bottom, left, ready}) => (top || right || bottom || left) && !ready;
+// const isNeighbor = (targetMaze, maze) => {
+// 	let xDiff = Math.abs(targetMaze.x - maze.x);
+// 	let yDiff = Math.abs(targetMaze.y - maze.y);
+// 	if (xDiff === 0) {
+// 		return yDiff === 1;
+// 	} else if (yDiff === 0) {
+// 		return xDiff === 1;
+// 	}
+// };
+const isNeighbor = (targetMaze, maze) => Math.abs(targetMaze.x - maze.x) + Math.abs(targetMaze.y - maze.y) === 1;
 const connectMaze = (target, nominee, ready = false) => {
 	let xDiff = (target.x - nominee.x);
 	let yDiff = (target.y - nominee.y);
 
+	target.ready = ready;
+	nominee.ready = ready;
+	
 	if (Math.abs(xDiff) === 0) {
 		if (yDiff === -1) {
 			target.bottom = true;
@@ -33,8 +37,6 @@ const connectMaze = (target, nominee, ready = false) => {
 			nominee.right = true;
 		}
 	}
-	target.ready = ready;
-	nominee.ready = ready;
 };
 const random = (min = 0, max = 0) => {
 	if (max < min) {
@@ -210,52 +212,78 @@ const store = () => new Vuex.Store({
 			}
 		},
 		'generate-wilson': function({ dispatch, state, commit, getters }) {
-			let { tracking, startPosition, maze } = state;
+			let { tracking, startPosition, maze, width } = state;
 			let { activeMaze, unActiveMaze, flattenMaze } = getters;
-			if (tracking.length === 0) {
-				if (unActiveMaze.length === 0) {
-					commit('endTimer');
-				} else {
-					let target = state.maze[random(state.height)][random(state.width)];
-					console.log('보충', target);
-					tracking.push(target);
-					requestAnimationFrame(() => dispatch('generate-wilson'));
-				}
+			let lastTracking = tracking[tracking.length - 1];
+			if (unActiveMaze.lenght === 0) {
+				commit('endTimer');
 				return;
 			}
+			
+			const setCurrent = (target) => {
+				commit('setCurrent', target.y * state.width + target.x);
+			};
 
-			let lastTracking = tracking[tracking.length - 1];
-			let llastTracking = tracking[tracking.length - 2];
-			if (checkActive(lastTracking)) {
-				console.log(tracking);
-				if (tracking.length === 2) {
-					connectMaze(lastTracking, llastTracking);
-					maze.forEach(row => row.forEach(cell => cell.ready = false));
-					commit('popTracking');
+			if (activeMaze.length === 0) {
+				if (tracking.length === 0) {
+					do {
+						lastTracking = unActiveMaze[random(unActiveMaze.length - 1)];
+					} while(lastTracking === startPosition);
+					commit('pushTracking', lastTracking);
 				}
-				if (tracking.length > 2) {
-					connectMaze(lastTracking, llastTracking);
-					commit('popTracking');
-				}
-				commit('popTracking');
-			} else {
-				let nominees = flattenMaze.filter(maze => isNeighbor(lastTracking, maze));
-				let nominee = nominees[random(0, nominees.length - 1)];
-				
-				if (startPosition === nominee) {
+
+				let nominees = unActiveMaze.filter(maze => isNeighbor(lastTracking, maze));
+				let nominee = nominees[random(nominees.length - 1)];
+
+				if (nominee === startPosition) {
 					connectMaze(lastTracking, nominee);
-					commit('popTracking');
+					commit('pushTracking', nominee);
+					requestAnimationFrame(() => dispatch('generate-wilson'));
+					return;
 				} else if (tracking.indexOf(nominee) !== -1) {
-					while(tracking.indexOf(nominee) !== -1) {
+					while (tracking.indexOf(nominee) !== -1) {
 						commit('popTracking');
 					}
-					nominee.ready = true;
-					tracking.push(nominee);
-				} else {
-					nominee.ready = true;
-					tracking.push(nominee);
 				}
-				commit('setCurrent', (nominee.y + 1) * state.width + (nominee.x + 1));
+				lastTracking.ready = true;
+				nominee.ready = true;
+				setCurrent(nominee);
+				commit('pushTracking', nominee);
+			} else {			
+				let llastTracking = tracking[tracking.length - 2];
+				let nominee;
+				
+				if (tracking.length >= 2) {
+					if (checkActive(lastTracking)) {
+						connectMaze(llastTracking, lastTracking);
+						if (unActiveMaze.length === 2) {
+							flattenMaze.forEach(maze => maze.ready = false);
+							commit('popTracking');
+							setCurrent({x: -1, y: 0});
+						} else {
+							setCurrent(llastTracking);
+						}
+						commit('popTracking');
+					} else {
+						let nominees = flattenMaze.filter(maze => isNeighbor(lastTracking, maze));
+						nominee = nominees[random(nominees.length - 1)];
+						commit('pushTracking', nominee);
+						setCurrent(nominee);
+						llastTracking.ready = true;
+						lastTracking.ready = true;
+					}
+				} else if (tracking.length === 1) {
+					let nominees = flattenMaze.filter(maze => isNeighbor(lastTracking, maze));
+					nominee = nominees[random(nominees.length - 1)];
+					nominee.ready = true;
+					commit('pushTracking', nominee);
+					setCurrent(lastTracking);
+				} else {
+					lastTracking = unActiveMaze[random(unActiveMaze.length - 1)];
+					lastTracking.ready = true;
+					commit('pushTracking', lastTracking);
+					setCurrent(lastTracking);
+				}
 			}
 			requestAnimationFrame(() => dispatch('generate-wilson'));
 		}

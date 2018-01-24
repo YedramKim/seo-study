@@ -13,7 +13,7 @@
 							:class="{
 								none: !(cell.top || cell.right || cell.bottom || cell.left) && !cell.ready,
 								ready: cell.ready,
-								current: ((idx + 1) * width + rowIdx) === current,
+								current: (idx * width + rowIdx) === current,
 								'connect-left': cell.left,
 								'connect-right': cell.right,
 								'connect-top': cell.top,
@@ -118,7 +118,7 @@ export default {
 				background-color: rgba(255, 0, 0, .5);
 			}
 
-			&.current {
+			&.current.ready {
 				background-color: #2cff00;
 			}
 
