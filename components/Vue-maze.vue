@@ -11,7 +11,9 @@
 							v-for="(cell, rowIdx) in row"
 							:key="rowIdx"
 							:class="{
-								none: !(cell.top || cell.right || cell.bottom || cell.left),
+								none: !(cell.top || cell.right || cell.bottom || cell.left) && !cell.ready,
+								ready: cell.ready,
+								current: ((idx + 1) * width + rowIdx) === current,
 								'connect-left': cell.left,
 								'connect-right': cell.right,
 								'connect-top': cell.top,
@@ -37,6 +39,7 @@
 			<select v-model="type">
 				<option value="prim">Prim's Algorithm</option>
 				<option value="hunt">Hunt-and-Kill Algorithm</option>
+				<option value="backtracking">Recursive Backtracking</option>
 				<option value="wilson">Wilson's Algorithm</option>
 			</select>
 			<button @click="generateMaze(type)">
@@ -54,6 +57,7 @@ export default {
 	computed: {
 		...mapState({
 			maze: 'maze',
+			current: 'current',
 			timer: 'timer'
 		}),
 		...{
@@ -85,7 +89,7 @@ export default {
 	},
 	data() {
 		return {
-			type: 'prim'
+			type: 'wilson'
 		};
 	},
 	mounted() {
@@ -99,7 +103,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-	@size: 30px;
+	@size: 10px;
 	table {
 		margin: 0 auto;
 		border-collapse: collapse;
@@ -109,6 +113,14 @@ export default {
 			box-sizing: border-box;
 
 			border: 1px solid #000000;
+
+			&.ready {
+				background-color: rgba(255, 0, 0, .5);
+			}
+
+			&.current {
+				background-color: #2cff00;
+			}
 
 			&.none {
 				background: #000000;

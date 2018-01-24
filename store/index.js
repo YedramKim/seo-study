@@ -1,7 +1,7 @@
 import Vuex from 'vuex';
 import _ from 'lodash';
 
-const Cell = ({x, y, top, right, bottom, left}) => ({x, y, top, right, bottom, left});
+const Cell = ({x, y, ready, top, right, bottom, left}) => ({x, y,ready,  top, right, bottom, left});
 const checkActive = ({top, right, bottom, left}) => top || right || bottom || left;
 const isNeighbor = (targetMaze, maze) => {
 	let xDiff = Math.abs(targetMaze.x - maze.x);
@@ -12,7 +12,7 @@ const isNeighbor = (targetMaze, maze) => {
 		return xDiff === 1;
 	}
 };
-const connectMaze = (target, nominee) => {
+const connectMaze = (target, nominee, ready = false) => {
 	let xDiff = (target.x - nominee.x);
 	let yDiff = (target.y - nominee.y);
 
@@ -33,6 +33,8 @@ const connectMaze = (target, nominee) => {
 			nominee.right = true;
 		}
 	}
+	target.ready = ready;
+	nominee.ready = ready;
 };
 const random = (min = 0, max = 0) => {
 	if (max < min) {
@@ -47,8 +49,10 @@ const store = () => new Vuex.Store({
 		height: 10,
 		maze: [],
 		startPosition: {},
+		current: -1,
 		startTime: 0,
-		timer: 0
+		timer: 0,
+		tracking: []
 	},
 	mutations: {
 		resetMaze(state) {
@@ -63,6 +67,15 @@ const store = () => new Vuex.Store({
 			state.maze = maze;
 			state.timer;
 		},
+		resetTracking(state) {
+			state.tracking = [];
+		},
+		pushTracking(state, track) {
+			state.tracking.push(track);
+		},
+		popTracking(state) {
+			state.tracking.pop();
+		},
 		setStartPosition(state, pos) {
 			state.startPosition = pos;
 		},
@@ -76,6 +89,9 @@ const store = () => new Vuex.Store({
 			console.time('timer');
 			state.startTime = Date.now();
 			state.timer = 0;
+		},
+		setCurrent(state, c) {
+			state.current = c;
 		},
 		endTimer(state) {
 			console.timeEnd('timer');
@@ -98,6 +114,8 @@ const store = () => new Vuex.Store({
 			const {width, height} = state;
 			let startPosition = state.maze[random(state.height)][random(state.width)];
 			commit('setStartPosition', startPosition);
+			commit('setCurrent', -1);
+			commit('resetTracking');
 			commit('startTimer');
 			dispatch(`generate-${type}`);
 		},
@@ -124,9 +142,7 @@ const store = () => new Vuex.Store({
 
 			connectMaze(target, nominee);
 
-			requestAnimationFrame(() => {
-				dispatch('generate-prim');
-			});
+			requestAnimationFrame(() => dispatch('generate-prim'));
 		},
 		'generate-hunt': function({ dispatch, state, commit, getters }) {
 			let target = state.startPosition;
@@ -134,6 +150,7 @@ const store = () => new Vuex.Store({
 			let nominees = unActiveMaze.filter(maze => isNeighbor(target, maze));
 			let nominee;
 			if (unActiveMaze.length === 0) {
+				commit('endTimer');
 				return;
 			} else if (nominees.length === 0) {
 				nominee = unActiveMaze.find(maze => {
@@ -154,12 +171,93 @@ const store = () => new Vuex.Store({
 			connectMaze(target, nominee);
 			commit('setStartPosition', nominee);
 
-			requestAnimationFrame(() => {
-				dispatch('generate-hunt');
-			});
+			requestAnimationFrame(() => dispatch('generate-hunt'));
+		},
+		'generate-backtracking': function({ dispatch, state, commit, getters }) {
+			let target = state.startPosition;
+			let { tracking } = state;
+			let { activeMaze, unActiveMaze } = getters;
+			let nominee;
+			if (tracking.length === 0) {
+				if (unActiveMaze.length === 0) {
+					commit('endTimer');
+				} else {
+					target.ready = true;
+					tracking.push(target);
+					requestAnimationFrame(() => dispatch('generate-backtracking'));
+				}
+				return;
+			}
+
+			let nominees = unActiveMaze.filter(maze => isNeighbor(target, maze) && !maze.ready);
+			if (nominees.length !== 0) {
+				nominee = nominees[random(0, nominees.length - 1)];
+				nominee.ready = true;
+				connectMaze(target, nominee, true);
+				tracking.push(nominee);
+				commit('setStartPosition', nominee);
+				requestAnimationFrame(() => dispatch('generate-backtracking'));
+			} else if(tracking.length === 1 && unActiveMaze.length === 0) {
+				commit('endTimer');
+				return;
+			} else {
+				target = tracking[tracking.length - 2];
+				nominee = tracking[tracking.length - 1];
+				connectMaze(target, nominee);
+				commit('popTracking');
+				commit('setStartPosition', target);
+				requestAnimationFrame(() => dispatch('generate-backtracking'));
+			}
 		},
 		'generate-wilson': function({ dispatch, state, commit, getters }) {
-			console.log('generate-wilson');
+			let { tracking, startPosition, maze } = state;
+			let { activeMaze, unActiveMaze, flattenMaze } = getters;
+			if (tracking.length === 0) {
+				if (unActiveMaze.length === 0) {
+					commit('endTimer');
+				} else {
+					let target = state.maze[random(state.height)][random(state.width)];
+					console.log('보충', target);
+					tracking.push(target);
+					requestAnimationFrame(() => dispatch('generate-wilson'));
+				}
+				return;
+			}
+
+			let lastTracking = tracking[tracking.length - 1];
+			let llastTracking = tracking[tracking.length - 2];
+			if (checkActive(lastTracking)) {
+				console.log(tracking);
+				if (tracking.length === 2) {
+					connectMaze(lastTracking, llastTracking);
+					maze.forEach(row => row.forEach(cell => cell.ready = false));
+					commit('popTracking');
+				}
+				if (tracking.length > 2) {
+					connectMaze(lastTracking, llastTracking);
+					commit('popTracking');
+				}
+				commit('popTracking');
+			} else {
+				let nominees = flattenMaze.filter(maze => isNeighbor(lastTracking, maze));
+				let nominee = nominees[random(0, nominees.length - 1)];
+				
+				if (startPosition === nominee) {
+					connectMaze(lastTracking, nominee);
+					commit('popTracking');
+				} else if (tracking.indexOf(nominee) !== -1) {
+					while(tracking.indexOf(nominee) !== -1) {
+						commit('popTracking');
+					}
+					nominee.ready = true;
+					tracking.push(nominee);
+				} else {
+					nominee.ready = true;
+					tracking.push(nominee);
+				}
+				commit('setCurrent', (nominee.y + 1) * state.width + (nominee.x + 1));
+			}
+			requestAnimationFrame(() => dispatch('generate-wilson'));
 		}
 	}
 });
