@@ -73,10 +73,12 @@ const store = () => new Vuex.Store({
 			state.height = height;
 		},
 		startTimer: function(state) {
+			console.time('timer');
 			state.startTime = Date.now();
 			state.timer = 0;
 		},
 		endTimer(state) {
+			console.timeEnd('timer');
 			state.timer = (Date.now() - state.startTime) / 1000;
 		}
 	},
@@ -129,11 +131,12 @@ const store = () => new Vuex.Store({
 		'generate-hunt': function({ dispatch, state, commit, getters }) {
 			let target = state.startPosition;
 			let { activeMaze, unActiveMaze } = getters;
-			let nominees = unActiveMaze.filter(maze => isNeighbor(startPosition, maze));
+			let nominees = unActiveMaze.filter(maze => isNeighbor(target, maze));
+			let nominee;
 			if (unActiveMaze.length === 0) {
 				return;
 			} else if (nominees.length === 0) {
-				let nominee = unActiveMaze.find(maze => {
+				nominee = unActiveMaze.find(maze => {
 					let result = activeMaze.some(maze2 => {
 						let result2 = isNeighbor(maze, maze2);
 						if (result2) {
@@ -146,11 +149,14 @@ const store = () => new Vuex.Store({
 					}
 				});
 			} else {
-				let nominee = nominees[random(0, nominees.length - 1)];
+				nominee = nominees[random(0, nominees.length - 1)];
 			}
 			connectMaze(target, nominee);
 			commit('setStartPosition', nominee);
-			commit('generate-hunt');
+
+			requestAnimationFrame(() => {
+				dispatch('generate-hunt');
+			});
 		},
 		'generate-wilson': function({ dispatch, state, commit, getters }) {
 			console.log('generate-wilson');
