@@ -2,7 +2,7 @@ import Vuex from 'vuex';
 import _ from 'lodash';
 
 const Cell = ({x, y, ready, top, right, bottom, left}) => ({x, y,ready,  top, right, bottom, left});
-const checkActive = ({top, right, bottom, left, ready}) => (top || right || bottom || left) && !ready;
+const checkActive = ({top, right, bottom, left}) => (top || right || bottom || left);
 // const isNeighbor = (targetMaze, maze) => {
 // 	let xDiff = Math.abs(targetMaze.x - maze.x);
 // 	let yDiff = Math.abs(targetMaze.y - maze.y);
@@ -215,7 +215,7 @@ const store = () => new Vuex.Store({
 			let { tracking, startPosition, maze, width } = state;
 			let { activeMaze, unActiveMaze, flattenMaze } = getters;
 			let lastTracking = tracking[tracking.length - 1];
-			if (unActiveMaze.lenght === 0) {
+			if (unActiveMaze.length === 0) {
 				commit('endTimer');
 				return;
 			}
@@ -224,7 +224,7 @@ const store = () => new Vuex.Store({
 				commit('setCurrent', target.y * state.width + target.x);
 			};
 
-			if (activeMaze.length === 0) {
+			if (activeMaze.length === 0 && activeMaze.indexOf(startPosition) !== -1) {
 				if (tracking.length === 0) {
 					do {
 						lastTracking = unActiveMaze[random(unActiveMaze.length - 1)];
@@ -235,12 +235,7 @@ const store = () => new Vuex.Store({
 				let nominees = unActiveMaze.filter(maze => isNeighbor(lastTracking, maze));
 				let nominee = nominees[random(nominees.length - 1)];
 
-				if (nominee === startPosition) {
-					connectMaze(lastTracking, nominee);
-					commit('pushTracking', nominee);
-					requestAnimationFrame(() => dispatch('generate-wilson'));
-					return;
-				} else if (tracking.indexOf(nominee) !== -1) {
+				if (tracking.indexOf(nominee) !== -1) {
 					while (tracking.indexOf(nominee) !== -1) {
 						commit('popTracking');
 					}
@@ -254,12 +249,12 @@ const store = () => new Vuex.Store({
 				let nominee;
 				
 				if (tracking.length >= 2) {
-					if (checkActive(lastTracking)) {
+					if (checkActive(lastTracking) || lastTracking === startPosition) {
+						unActiveMaze.forEach(maze => maze.ready = false);
 						connectMaze(llastTracking, lastTracking);
-						if (unActiveMaze.length === 2) {
-							flattenMaze.forEach(maze => maze.ready = false);
+						if (tracking.length === 2) {
 							commit('popTracking');
-							setCurrent({x: -1, y: 0});
+							setCurrent({x: -1, y: -1});
 						} else {
 							setCurrent(llastTracking);
 						}
@@ -278,7 +273,7 @@ const store = () => new Vuex.Store({
 					nominee.ready = true;
 					commit('pushTracking', nominee);
 					setCurrent(lastTracking);
-				} else {
+				} else if (tracking.length === 0) {
 					lastTracking = unActiveMaze[random(unActiveMaze.length - 1)];
 					lastTracking.ready = true;
 					commit('pushTracking', lastTracking);
